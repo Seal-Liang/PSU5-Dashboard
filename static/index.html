@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Data Analysis Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/html2canvas.min.js"></script>
+    <script src="/js/app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h2>Project Status Analysis</h2>
+            <p>Resource Distribution & Utilization</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" class="active" id="nav-dashboard">Dashboard</a></li>
+                <li><a href="#" id="nav-upload">Upload Data</a></li>
+                <li><a href="#" id="nav-settings">Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <h1 id="page-title">Overview Dashboard</h1>
+                <div class="filter-group" id="dashboard-filters" style="margin-top: 10px; display: flex; gap: 15px; align-items:flex-end;">
+                    <div>
+                        <label for="teamFilter" style="font-weight: 500; margin-right: 5px; font-size: 0.9em;">Team:</label>
+                        <select id="teamFilter" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                            <option value="All">All Teams</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="timeFrameFilter" style="font-weight: 500; margin-right: 5px; font-size: 0.9em;">Time Frame:</label>
+                        <select id="timeFrameFilter" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                            <option value="All">All Time</option>
+                            <option value="Year" selected>Year</option>
+                            <option value="Quarter">Quarter</option>
+                            <option value="Month">Month</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="intervalFilter" style="font-weight: 500; margin-right: 5px; font-size: 0.9em;">Interval:</label>
+                        <select id="intervalFilter" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="groupByFilter" style="font-weight: 500; margin-right: 5px; font-size: 0.9em;">Group By:</label>
+                        <select id="groupByFilter" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                            <option value="BU">BU</option>
+                            <option value="Product Code">Product Code</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                <div class="period-selector" id="periodSelectorContainer" style="display: none;">
+                    <button class="period-btn" id="periodPrev">&lt;</button>
+                    <span id="periodLabel">2023</span>
+                    <button class="period-btn" id="periodNext">&gt;</button>
+                </div>
+                <span id="last-updated">Last Updated: N/A</span>
+            </div>
+        </header>
+
+        <!-- Dashboard View -->
+        <section id="view-dashboard" class="view-section active">
+            <div class="metrics-container" style="display: block;">
+                <div class="metric-card" id="pieWidgetCard" style="width: 100%; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+                        <div>
+                            <h3 id="pieTitle" style="margin-bottom:8px; font-size: 1.2rem;">[All Teams] Total Hours & Utilization</h3>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">
+                                Avg Utilization: <span id="overall-util">--%</span> &nbsp;&nbsp;|&nbsp;&nbsp; Total Tracked: <span id="total-hours">0</span> Hrs
+                            </div>
+                        </div>
+                        <div style="display:flex;">
+                            <button class="icon-btn export-btn" onclick="downloadWidget('pieWidgetCard', 'Hours_Distribution')" title="Download Image">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            </button>
+                            <button class="icon-btn export-btn" onclick="copyWidget('pieWidgetCard')" title="Copy to Clipboard">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1Zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1Zm-2 2A1.5 1.5 0 0 1 4.5 2h.879a2.5 2.5 0 1 0 5.242 0h.879A1.5 1.5 0 0 1 13 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 12.5v-9Z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 40px; width: 100%;">
+                        <div style="position:relative; height: 320px; width: 320px; flex-shrink: 0;">
+                            <canvas id="buPieChart"></canvas>
+                        </div>
+                        <div id="pieLegend" style="font-size: 0.95rem; flex: 1; display: flex; flex-direction: column; gap: 15px; max-height: 320px; overflow-y: auto; padding-right: 15px;">
+                            <!-- Legend dynamic -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card" id="buChartCard">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 id="buChartTitle" style="margin-bottom:0;">[All Teams] Department Hours by BU (Trend)</h3>
+                        <div style="display:flex;">
+                            <button class="icon-btn export-btn" onclick="downloadWidget('buChartCard', 'Hours_by_Category')" title="Download Image">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            </button>
+                            <button class="icon-btn export-btn" onclick="copyWidget('buChartCard')" title="Copy to Clipboard">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1Zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1Zm-2 2A1.5 1.5 0 0 1 4.5 2h.879a2.5 2.5 0 1 0 5.242 0h.879A1.5 1.5 0 0 1 13 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 12.5v-9Z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="buChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card" id="utilChartCard">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 id="utilChartTitle" style="margin-bottom:0;">[All Teams] Workforce Utilization Rate (%)</h3>
+                        <div style="display:flex;">
+                            <button class="icon-btn export-btn" onclick="downloadWidget('utilChartCard', 'Utilization_Rate')" title="Download Image">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            </button>
+                            <button class="icon-btn export-btn" onclick="copyWidget('utilChartCard')" title="Copy to Clipboard">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1Zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1Zm-2 2A1.5 1.5 0 0 1 4.5 2h.879a2.5 2.5 0 1 0 5.242 0h.879A1.5 1.5 0 0 1 13 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 12.5v-9Z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="utilChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upload View -->
+        <section id="view-upload" class="view-section" style="display: none;">
+            <div class="upload-container">
+                <h2>Import Data</h2>
+                
+                <div class="upload-box" id="dropzone-reports">
+                    <p>Drag & Drop Multiple Weekly Status Reports (.xlsx)</p>
+                    <input type="file" id="weeklyReportFile" accept=".xlsx" multiple style="display:none;">
+                    <button class="btn btn-primary" onclick="document.getElementById('weeklyReportFile').click()">Browse Files</button>
+                    <div id="reportsFileList" class="file-list"></div>
+                </div>
+                <button class="btn btn-primary" id="uploadReportsBtn" style="margin-top:10px; width: 100%;">Upload Weekly Reports</button>
+                <div id="uploadReportsStatus" class="status-msg" style="margin-bottom: 20px;"></div>
+                
+                <hr style="margin: 30px 0; border:0; border-top:1px solid var(--border-color);">
+                
+                <div class="upload-box" id="dropzone-bu" style="border-color: #64748b;">
+                    <p>Update BU Classification Mapping (.xlsx) - Optional</p>
+                    <input type="file" id="buMappingFile" accept=".xlsx" style="display:none;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('buMappingFile').click()">Browse BU File</button>
+                    <div id="buFileList" class="file-list"></div>
+                </div>
+                <button class="btn btn-secondary" id="uploadBuBtn" style="margin-top:10px; width: 100%;">Upload BU Classification</button>
+                <div id="uploadBuStatus" class="status-msg"></div>
+
+            </div>
+        </section>
+
+        <!-- Settings View -->
+        <section id="view-settings" class="view-section" style="display: none;">
+            <!-- Main Grid Container -->
+            <div class="settings-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: flex-start; max-width: 1400px; margin: 0 auto;">
+                
+                <!-- Left Column: Holidays -->
+                <div class="settings-card" style="height: 100%;">
+                    <h3>System Calendar & Holidays</h3>
+                    <p style="font-size: 0.9em; color: #666; margin: 10px 0 15px 0;">Manage Global National Holidays or Company Off-Days to dynamically adjust available working days and utilization rates.</p>
+                    
+                    <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px; background: #f8faff; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                        <input type="file" id="holidayUploadFile" accept=".csv, .xlsx, .xls" style="display:none;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('holidayUploadFile').click()" style="background-color: white; border: 1px solid #ccc;">Bulk Upload (Excel/CSV)</button>
+                        <span style="font-size:0.8rem; color:#888;">Columns: "Date", "Name"</span>
+                        <span id="holidayUploadStatus" style="font-size: 0.9em; font-weight: 600;"></span>
+                    </div>
+
+                    <!-- Scrollable table container -->
+                    <div style="max-height: 480px; overflow-y: auto; overflow-x: hidden; border: 1px solid var(--border-color); border-radius: 6px;">
+                        <table id="holidayTable" style="margin: 0; box-shadow: none;">
+                            <thead style="position: sticky; top: 0; background: #fff; z-index: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                                <tr>
+                                    <th style="border-top: none;">Date</th>
+                                    <th style="border-top: none;">Name</th>
+                                    <th style="border-top: none; width: 60px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holidayTbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="add-row" style="margin-top: 15px;">
+                        <input type="date" id="newHolidayDate" style="flex:1;">
+                        <input type="text" id="newHolidayName" placeholder="Holiday Name" style="flex:2;">
+                        <button class="btn btn-secondary" id="addHolidayBtn">Add</button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Headcount Logs -->
+                <div class="settings-card" style="height: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3>Department Headcount Configuration</h3>
+                        <button class="btn btn-primary" id="saveSettingsBtn" style="padding: 6px 12px; font-size: 0.9em;">Save Settings</button>
+                    </div>
+                    <span id="settingsStatus" class="status-msg" style="display:block; text-align:right; margin-bottom: 5px;"></span>
+
+                    <div class="form-group" style="margin-top: 15px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                        <label for="settingsTeamSelect" style="font-weight: 600; font-size: 0.95rem; color: #1e293b;">Select Target Team:</label>
+                        <select id="settingsTeamSelect" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem; color: var(--primary-color);">
+                            <option value="">-- Choose a Team --</option>
+                        </select>
+                    </div>
+                    
+                    <div id="teamLogContainer" style="display: none; margin-top: 20px;">
+                        <div style="display: flex; gap: 20px; background: #f8faff; padding: 15px; border-radius: 6px; border: 1px solid var(--border-color);">
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label style="font-weight: 600; font-size: 0.9rem; color: #475569;">Initial Baseline Core Headcount</label>
+                                <input type="number" id="initialHeadcount" min="0" style="padding: 10px; width:100%; border-radius:5px; border:1px solid #ccc; font-weight: 600; font-size: 1.1rem;">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                            <h4 style="margin: 0; color: #334155;">Workforce Change Log</h4>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="file" id="logUploadFile" accept=".csv, .xlsx, .xls" style="display:none;">
+                                <button class="btn btn-secondary" onclick="document.getElementById('logUploadFile').click()" style="background-color: white; border: 1px solid #ccc; padding: 5px 10px; font-size: 0.85rem;">[+] Bulk Upload (Excel/CSV)</button>
+                                <span id="logUploadStatus" style="font-size: 0.85rem; font-weight: 600;"></span>
+                            </div>
+                        </div>
+                        
+                        <div style="max-height: 350px; overflow-y: auto; overflow-x: hidden; border: 1px solid var(--border-color); border-radius: 6px;">
+                            <table id="logTable" style="margin: 0; box-shadow: none;">
+                                <thead style="position: sticky; top: 0; background: #fff; z-index: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                                    <tr>
+                                        <th style="border-top: none;">Date</th>
+                                        <th style="border-top: none;">Type</th>
+                                        <th style="border-top: none;">Name</th>
+                                        <th style="border-top: none; width: 60px;">Act</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logTbody">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="add-row" style="margin-top: 15px;">
+                            <input type="date" id="newLogDate" style="flex:1;">
+                            <select id="newLogType" style="flex:1.5; padding:8px;">
+                                <option value="到職 (Onboard)">到職 (+1)</option>
+                                <option value="離職 (Depart)">離職 (-1)</option>
+                                <option value="留停 (Leave)">留停 (-1)</option>
+                                <option value="不須記錄工時 (NoTracking)">不需工時 (-1)</option>
+                            </select>
+                            <input type="text" id="newLogName" placeholder="Person Name" style="flex:1.5;">
+                            <button class="btn btn-secondary" id="addLogBtn" style="flex:1;">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
