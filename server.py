@@ -74,7 +74,7 @@ def upload_reports():
         path = os.path.join(TMP_DIR, secure_filename(report.filename))
         report.save(path)
         try:
-            weekly_data = parse_weekly_report(path, mapping_dict)
+            weekly_data = parse_weekly_report(path, mapping_dict, filename=report.filename)
             save_weekly_data(weekly_data)
             results.append({"file": report.filename, "status": "success"})
         except Exception as e:
@@ -224,4 +224,6 @@ def set_settings():
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    from flaskwebgui import FlaskUI
+    # 使用 FlaskUI 將網頁應用程式打包成類似桌面應用
+    FlaskUI(app=app, server="flask", port=5000, width=1280, height=800).run()
