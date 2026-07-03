@@ -1,5 +1,9 @@
-pandas==2.2.0
-openpyxl==3.1.2
+# Lower bounds, not exact pins: pandas 2.2.0 has no wheel for Python 3.14
+# (source build fails), and pandas 3.x requires openpyxl >= 3.1.5. Using >=
+# lets pip resolve a wheel that matches whatever Python version is building.
+# Tested on Python 3.14 with pandas 3.0.3 / openpyxl 3.1.5+.
+pandas>=2.2.3
+openpyxl>=3.1.5
 Flask==3.0.2
 python-dotenv==1.0.1
 flaskwebgui==1.1.2
