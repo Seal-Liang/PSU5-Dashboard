@@ -8,6 +8,10 @@ A local-first **Weekly Project Status Dashboard**. Users upload weekly Excel/xls
 
 Tech stack: **Flask** (thin API/router) · **pandas + openpyxl** (Excel parsing) · **vanilla JS + Chart.js + html2canvas + JSZip** (frontend, no build step). No database — state is a JSON file.
 
+## Planning documents
+
+Write plan-mode docs, task breakdowns, design proposals, and handoff notes into **[`plans/`](plans/)** in this repo — **not** the global `~/.claude/plans/`. Keep them versioned with the code. One Markdown file per plan, named `YYYY-MM-DD-<slug>.md`. See [plans/README.md](plans/README.md).
+
 ## Commands
 
 ```bash
