@@ -59,3 +59,4 @@ The system relies on JSON structures to store and process the uploaded Excel dat
 - **Local Deployment:** Run `python server.py` and open `http://localhost:5000` to interact with the dashboard.
 - **Python Dependencies:** Requires `Flask`, `pandas`, `openpyxl`, and `python-dotenv`.
 - **Data Shape:** Changing the Excel source format (e.g., migrating from Row 5 headers) requires a Layer 1 SOP review (`architecture/1_parser_sop.md`) followed by a Layer 3 Tool update (`tools/excel_parser.py`).
+

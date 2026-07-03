@@ -45,9 +45,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let availablePeriods = { Year: [], Quarter: [], Month: [] };
     let currentPeriodIdx = { Year: 0, Quarter: 0, Month: 0 };
 
+    function parseWeekId(id) {
+        const match = id.match(/^(\d+)WK(\d+)$/);
+        if (match) return { year: parseInt(match[1]), week: parseInt(match[2]) };
+        return { year: 0, week: 0 };
+    }
+
     function getLatestWeekId() {
         if (!globalDataCache || !globalDataCache.WeeklyData || globalDataCache.WeeklyData.length === 0) return "";
-        let weeks = [...globalDataCache.WeeklyData].sort((a,b) => a.week_id.localeCompare(b.week_id));
+        let weeks = [...globalDataCache.WeeklyData].sort((a,b) => {
+            const pa = parseWeekId(a.week_id);
+            const pb = parseWeekId(b.week_id);
+            if (pa.year !== pb.year) return pa.year - pb.year;
+            return pa.week - pb.week;
+        });
         let latestId = weeks[weeks.length-1].week_id;
         // Convert '2026WK16' -> '26WK16' if applicable
         if (latestId.match(/^20\d{2}WK/)) {
@@ -808,7 +819,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('utilChartTitle').textContent = `${prefix} Workforce Utilization Rate (%)`;
         document.getElementById('pieTitle').textContent = `${prefix} Total Hours & Avg Utilization`;
         
-        let weeks = [...data.WeeklyData].sort((a,b) => a.week_id.localeCompare(b.week_id));
+        let weeks = [...data.WeeklyData].sort((a,b) => {
+            const pa = parseWeekId(a.week_id);
+            const pb = parseWeekId(b.week_id);
+            if (pa.year !== pb.year) return pa.year - pb.year;
+            return pa.week - pb.week;
+        });
         document.getElementById('last-updated').textContent = "Last Updated: " + weeks[weeks.length-1].date;
 
         if (frame !== 'All Time' && frame !== 'All') {
@@ -1003,7 +1019,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  if(!utilTrends[dpt]) utilTrends[dpt] = new Array(labels.length).fill(null);
                  utilTrends[dpt][LIdx] = periodDeptMax[dpt] > 0
                      ? (periodDeptLogged[dpt] / periodDeptMax[dpt]) * 100
-                     : 0; // workDays=0 => 0% rather than null (keeps line continuous)
+                     : null; // workDays=0 => null rather than 0 (keeps Y-axis scale healthy, spanGaps=true handles continuity)
             });
         });
 
@@ -1059,7 +1075,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fill: false,
             borderColor: borderPalette[idx % borderPalette.length],
             tension: 0.3,
-            borderWidth: 3
+            borderWidth: 3,
+            spanGaps: true
         }));
 
         let existingUtil = Chart.getChart('utilChart'); if (existingUtil) existingUtil.destroy();
