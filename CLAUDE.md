@@ -10,7 +10,7 @@ Tech stack: **Flask** (thin API/router) · **pandas + openpyxl** (Excel parsing)
 
 ## Planning documents
 
-Write plan-mode docs, task breakdowns, design proposals, and handoff notes into **[`plans/`](plans/)** in this repo — **not** the global `~/.claude/plans/`. Keep them versioned with the code. One Markdown file per plan, named `YYYY-MM-DD-<slug>.md`. See [plans/README.md](plans/README.md).
+Plan-mode docs, task breakdowns, design proposals, and handoff notes go in **[`plans/`](plans/)** in this repo, versioned with the code — **not** the global `~/.claude/plans/`. This is enforced by `"plansDirectory": "./plans"` in [.claude/settings.json](.claude/settings.json), so plan mode writes there automatically. One Markdown file per plan, named `YYYY-MM-DD-<slug>.md`. See [plans/README.md](plans/README.md).
 
 ## Commands
 
