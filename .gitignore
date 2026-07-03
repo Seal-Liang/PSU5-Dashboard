@@ -1,6 +1,8 @@
 .env
 data.json
+data.json.bak*
 .tmp/
+scratch/
 build/
 dist/
 __pycache__/
