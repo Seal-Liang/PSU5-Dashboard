@@ -14,7 +14,7 @@ def parse_bu_mapping(filepath):
             try:
                 df = pd.read_csv(filepath, encoding='big5')
             except Exception:
-                df = pd.read_csv(filepath, encoding='utf-8', errors='replace')
+                df = pd.read_csv(filepath, encoding='utf-8', encoding_errors='replace')
     else:
         try:
             xl = pd.ExcelFile(filepath)
@@ -24,7 +24,7 @@ def parse_bu_mapping(filepath):
             try:
                 df = pd.read_csv(filepath)
             except Exception:
-                df = pd.read_csv(filepath, encoding='big5', errors='replace')
+                df = pd.read_csv(filepath, encoding='big5', encoding_errors='replace')
     
     # Expected columns: ['Unnamed: 0', 'BG', 'BU', 'Product Code', 'Product Name', '聯絡窗口...']
     mapping = {}

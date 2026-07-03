@@ -156,12 +156,12 @@ def upload_logs():
             try:
                 df = pd.read_csv(path)
             except:
-                df = pd.read_csv(path, encoding='big5', errors='replace')
+                df = pd.read_csv(path, encoding='big5', encoding_errors='replace')
         else:
             try:
                 df = pd.read_excel(path)
             except:
-                df = pd.read_csv(path, encoding='big5', errors='replace')
+                df = pd.read_csv(path, encoding='big5', encoding_errors='replace')
 
         data = load_data()
         logs_data = data["Settings"].get("headcount_logs", [])

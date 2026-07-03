@@ -1,8 +1,11 @@
 import json
+import os
 import sys
 
+DATA_FILE = os.path.join(os.path.dirname(__file__), 'data.json')
+
 try:
-    with open('d:/CODE/PSU5/data.json', 'r', encoding='utf-8') as f:
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
         data = json.load(f)
 except Exception as e:
     print(f"Error reading JSON: {e}")
@@ -23,10 +26,9 @@ for w in wk_data:
             unmapped_count += 1
         total_records += 1
 
+mapped_count = total_records - unmapped_count
 print(f"\nTotal Records: {total_records}")
-print(f"Unmapped: {unmapped_count}")
-    
-print(f"\nUnmapped: {unmapped_count}, Mapped: {mapped_count}")
+print(f"Unmapped: {unmapped_count}, Mapped: {mapped_count}")
 
 # Check for a specific match
 if mappings and wk_data:

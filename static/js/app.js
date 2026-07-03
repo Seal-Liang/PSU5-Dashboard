@@ -1314,8 +1314,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let dptFound = new Set();
             (wk.records || []).forEach(r => {
-                if(filterTeam !== 'All' && r.department !== filterTeam) return;
-                
+                if(!matchesFilter(r.department)) return;
+
                 let groupKey = groupBy === 'BU' ? (r.bu || "Unknown") : (r.product_code || "Unknown");
                 if(!rawRadarData[groupKey]) rawRadarData[groupKey] = new Array(radarScaleMode === 'month' ? 12 : 52).fill(0);
                 rawRadarData[groupKey][radarIdx] += r.hours;
